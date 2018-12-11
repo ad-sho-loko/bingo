@@ -11,8 +11,9 @@ type Node interface {
 	AddChild(child *Node)
 }
 
-type DocumentNode struct{
-	children   []*Node
+// Root node in dom tree.
+type DocumentNode struct {
+	children []*Node
 }
 
 func (n *DocumentNode) Children() []*Node {
@@ -26,7 +27,7 @@ func (n *DocumentNode) AddChild(child *Node) {
 type TagNode struct {
 	name     string
 	elements []Element
-	children   []*Node
+	children []*Node
 }
 
 func (n *TagNode) Children() []*Node {
@@ -38,7 +39,7 @@ func (n *TagNode) AddChild(child *Node) {
 }
 
 type TextNode struct {
-	value  string
+	value    string
 	children []*Node
 }
 
@@ -65,7 +66,7 @@ func NewParser() *Parser {
 	}}
 }
 
-func (p *Parser) currentParentNode() *Node{
+func (p *Parser) currentParentNode() *Node {
 	return p.parentNodeStack[0]
 }
 
@@ -75,7 +76,7 @@ func (p *Parser) pushNode(node *Node) {
 
 func (p *Parser) popNode() *Node {
 	n := p.parentNodeStack[0]
-	if len(p.parentNodeStack) > 1{
+	if len(p.parentNodeStack) > 1 {
 		p.parentNodeStack = p.parentNodeStack[1:]
 	}
 	return n
@@ -96,8 +97,8 @@ func (p *Parser) parse(tokens []*Token) []*Node {
 			p.popNode()
 
 		case Text, Space:
-			node := &TextNode{value:"", children:[]*Node{}}
-			for ; !(tokens[i].kind == LeftBracket || tokens[i].kind == LeftBracketWithSlash); i++{
+			node := &TextNode{value: "", children: []*Node{}}
+			for ; !(tokens[i].kind == LeftBracket || tokens[i].kind == LeftBracketWithSlash); i++ {
 				node.value += tokens[i].value
 			}
 			i--
@@ -123,8 +124,8 @@ func (p *Parser) parseTag(tokens []*Token, i *int) *Node {
 
 	// set tag name
 	var node Node = &TagNode{
-		name: tokens[*i].value,
-		children:[]*Node{},
+		name:     tokens[*i].value,
+		children: []*Node{},
 	}
 
 	for tokens[*i].kind != RightBracket {
@@ -142,21 +143,38 @@ func skipSpace(tokens []*Token, i *int) {
 }
 
 type Token struct {
-	kind  TokenType
+	kind  tokenType
 	value string
 }
 
-type TokenType int
+type tokenType int
 
 const (
-	Space                TokenType = iota
+	Space tokenType = iota
 	LeftBracket
 	RightBracket
 	LeftBracketWithSlash
 	Text
 )
 
-func NewToken(k TokenType, v string) *Token {
+func (t tokenType) String() string {
+	switch t {
+	case Space:
+		return "Space"
+	case LeftBracket:
+		return "LeftBracket"
+	case RightBracket:
+		return "RightBracket"
+	case LeftBracketWithSlash:
+		return "LeftBracketWithSlash"
+	case Text:
+		return "Text"
+	default:
+		return "Others"
+	}
+}
+
+func newToken(k tokenType, v string) *Token {
 	return &Token{
 		kind:  k,
 		value: v,
@@ -171,17 +189,17 @@ func (p *Parser) tokenize(bytes []byte) []*Token {
 		switch {
 		case b == ' ':
 			outIfBufExist(&tokens, &buf)
-			tokens = append(tokens, NewToken(Space, " "))
+			tokens = append(tokens, newToken(Space, " "))
 		case b == '<':
 			outIfBufExist(&tokens, &buf)
 			if bytes[i+1] == '/' {
-				tokens = append(tokens, NewToken(LeftBracketWithSlash, ""))
+				tokens = append(tokens, newToken(LeftBracketWithSlash, ""))
 			} else {
-				tokens = append(tokens, NewToken(LeftBracket, ""))
+				tokens = append(tokens, newToken(LeftBracket, ""))
 			}
 		case b == '>':
 			outIfBufExist(&tokens, &buf)
-			tokens = append(tokens, NewToken(RightBracket, ""))
+			tokens = append(tokens, newToken(RightBracket, ""))
 		case (b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z'):
 			buf = append(buf, b)
 		default:
@@ -193,7 +211,7 @@ func (p *Parser) tokenize(bytes []byte) []*Token {
 
 func outIfBufExist(tokens *[]*Token, buf *[]byte) bool {
 	if len(*buf) != 0 {
-		*tokens = append(*tokens, NewToken(Text, string(*buf)))
+		*tokens = append(*tokens, newToken(Text, string(*buf)))
 		*buf = nil
 		return true
 	}
@@ -201,23 +219,38 @@ func outIfBufExist(tokens *[]*Token, buf *[]byte) bool {
 }
 
 func main() {
-	// Parse
+	// [HTML]
+	// Read html file.
 	f, err := ioutil.ReadFile("test1.html")
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	// Tokeninze html
 	p := NewParser()
 	tokens := p.tokenize(f)
-	/*for _, t := range tokens{
+	for _, t := range tokens {
 		fmt.Print(*t)
-	}*/
+	}
 
+	// Parse Tokens
 	nodes := p.parse(tokens)
 	for _, n := range nodes {
 		fmt.Print(*n)
 	}
 
-	// Rendering
+	// [CSS]
+	// Read css file
+	// Tokenize css
+	// Parse Tokens
 
+	// [JavaScript]
+	// Read JavaScript
+	// Tokenize
+	// Make AST
+	// Generate VM Code
+	// Execute in
+
+	// [Rendering]
+	// Finally, Rendering.
 }
