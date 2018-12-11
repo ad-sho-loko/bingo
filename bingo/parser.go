@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
-	"log"
 )
 
 type Node interface {
@@ -195,6 +193,9 @@ func (p *Parser) tokenize(bytes []byte) []*Token {
 	var buf []byte
 	for i, b := range bytes {
 		switch {
+		// case b == '/' && bytes[i+1] == '*':
+		//	outIfBufExist()
+		//  tokens = Comment!
 		case b == ' ':
 			outIfBufExist(&tokens, &buf)
 			tokens = append(tokens, newToken(Space, " "))
@@ -227,40 +228,3 @@ func outIfBufExist(tokens *[]*Token, buf *[]byte) bool {
 	return false
 }
 
-func main() {
-	// [HTML]
-	// Read html file.
-	f, err := ioutil.ReadFile("test1.html")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Tokeninze html
-	p := NewParser()
-	tokens := p.tokenize(f)
-	/*
-	for _, t := range tokens {
-		fmt.Print(*t)
-	}*/
-
-	// Parse Tokens
-	nodes := p.parse(tokens)
-	for _, n := range nodes {
-		fmt.Print(n)
-	}
-
-	// [CSS]
-	// Read css file
-	// Tokenize css
-	// Parse Tokens
-
-	// [JavaScript]
-	// Read JavaScript
-	// Tokenize
-	// Make AST
-	// Generate VM Code
-	// Execute in
-
-	// [Rendering]
-	// Finally, Rendering.
-}
