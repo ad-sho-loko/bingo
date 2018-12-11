@@ -7,52 +7,56 @@ import (
 )
 
 type Node interface {
-	Children() []*Node
-	AddChild(child *Node)
+	Children() []Node
+	AddChild(child Node)
 }
 
 // Root node in dom tree.
 type DocumentNode struct {
-	children []*Node
+	children []Node
 }
 
-func (n *DocumentNode) Children() []*Node {
+func (n *DocumentNode) Children() []Node {
 	return n.children
 }
 
-func (n *DocumentNode) AddChild(child *Node) {
+func (n *DocumentNode) AddChild(child Node) {
 	n.children = append(n.children, child)
 }
 
-type TagNode struct {
+type ElementNode struct {
 	name     string
-	elements []Element
-	children []*Node
+	attribute map[string]string
+	children []Node
 }
 
-func (n *TagNode) Children() []*Node {
+func (n *ElementNode) String() string{
+	return fmt.Sprintf("ElementNode[%p]%+v\n", n, *n)
+}
+
+func (n *ElementNode) Children() []Node {
 	return n.children
 }
 
-func (n *TagNode) AddChild(child *Node) {
+func (n *ElementNode) AddChild(child Node) {
 	n.children = append(n.children, child)
 }
 
 type TextNode struct {
 	value    string
-	children []*Node
+	children []Node
 }
 
-func (n *TextNode) Children() []*Node {
+func (n *TextNode) String() string{
+	return fmt.Sprintf("TextNode[%p]%+v\n", n, *n)
+}
+
+func (n *TextNode) Children() []Node {
 	return n.children
 }
 
-func (n *TextNode) AddChild(child *Node) {
+func (n *TextNode) AddChild(child Node) {
 	n.children = append(n.children, child)
-}
-
-type Element struct {
-	attribute map[string]string
 }
 
 type CommentNode struct{
@@ -61,25 +65,27 @@ type CommentNode struct{
 }
 
 type Parser struct {
-	parentNodeStack []*Node
+	pos int
+	parentNodeStack []Node
 }
 
 func NewParser() *Parser {
 	var top Node = &DocumentNode{}
-	return &Parser{parentNodeStack: []*Node{
-		&top,
-	}}
+	return &Parser{
+		pos:0,
+		parentNodeStack: []Node{top},
+	}
 }
 
-func (p *Parser) currentParentNode() *Node {
+func (p *Parser) currentParentNode() Node {
 	return p.parentNodeStack[0]
 }
 
-func (p *Parser) pushNode(node *Node) {
-	p.parentNodeStack = append([]*Node{node}, p.parentNodeStack...)
+func (p *Parser) pushNode(node Node) {
+	p.parentNodeStack = append([]Node{node}, p.parentNodeStack...)
 }
 
-func (p *Parser) popNode() *Node {
+func (p *Parser) popNode() Node {
 	n := p.parentNodeStack[0]
 	if len(p.parentNodeStack) > 1 {
 		p.parentNodeStack = p.parentNodeStack[1:]
@@ -87,30 +93,28 @@ func (p *Parser) popNode() *Node {
 	return n
 }
 
-func (p *Parser) parse(tokens []*Token) []*Node {
-	var nodes []*Node
-	for i := 0; i < len(tokens); i++ {
-		switch tokens[i].kind {
+func (p *Parser) parse(tokens []*Token) []Node {
+	var nodes []Node
+	for ; p.pos < len(tokens); p.pos++{
+	switch tokens[p.pos].kind {
 		case LeftBracket:
-			node := p.parseTag(tokens, &i)
-			(*p.currentParentNode()).AddChild(node)
+			node := p.parseTag(tokens)
+			p.currentParentNode().AddChild(node)
 			p.pushNode(node)
 			nodes = append(nodes, node)
 
 		case LeftBracketWithSlash:
-			p.parseTag(tokens, &i)
+			p.parseTag(tokens)
 			p.popNode()
 
 		case Text, Space:
-			node := &TextNode{value: "", children: []*Node{}}
-			for ; !(tokens[i].kind == LeftBracket || tokens[i].kind == LeftBracketWithSlash); i++ {
-				node.value += tokens[i].value
+			node := &TextNode{value: "", children: []Node{}}
+			for ; !(tokens[p.pos].kind == LeftBracket || tokens[p.pos].kind == LeftBracketWithSlash); p.pos++ {
+				node.value += tokens[p.pos].value
 			}
-			i--
-			// これどうにかできないかな...
-			var n Node = node
-			(*p.currentParentNode()).AddChild(&n)
-			nodes = append(nodes, &n)
+			p.pos--
+			p.currentParentNode().AddChild(node)
+			nodes = append(nodes, node)
 
 		default:
 			// FIXME: Skip tab, LF, CR...(if you need to parse, add case of Text, Space....
@@ -119,31 +123,30 @@ func (p *Parser) parse(tokens []*Token) []*Node {
 	return nodes
 }
 
-func (p *Parser) parseTag(tokens []*Token, i *int) *Node {
-	*i++
-	skipSpace(tokens, i)
+func (p *Parser) parseTag(tokens []*Token) Node {
+	p.pos++
+	p.skipSpace(tokens)
 
-	if tokens[*i].kind != Text {
+	if tokens[p.pos].kind != Text {
 		panic("The next token of Left bracket should be string.")
 	}
 
 	// set tag name
-	var node Node = &TagNode{
-		name:     tokens[*i].value,
-		children: []*Node{},
+	var node Node = &ElementNode{
+		name:     tokens[p.pos].value,
+		children: []Node{},
 	}
 
-	for tokens[*i].kind != RightBracket {
-		*i++
+	for tokens[p.pos].kind != RightBracket {
+		p.pos++
 		// TODO : implement attribute.
 	}
-
-	return &node
+	return node
 }
 
-func skipSpace(tokens []*Token, i *int) {
-	for tokens[*i].kind == Space {
-		*i++
+func (p *Parser) skipSpace(tokens []*Token) {
+	for tokens[p.pos].kind == Space {
+		p.pos++
 	}
 }
 
@@ -235,14 +238,15 @@ func main() {
 	// Tokeninze html
 	p := NewParser()
 	tokens := p.tokenize(f)
+	/*
 	for _, t := range tokens {
 		fmt.Print(*t)
-	}
+	}*/
 
 	// Parse Tokens
 	nodes := p.parse(tokens)
 	for _, n := range nodes {
-		fmt.Print(*n)
+		fmt.Print(n)
 	}
 
 	// [CSS]
