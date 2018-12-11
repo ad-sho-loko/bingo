@@ -55,6 +55,11 @@ type Element struct {
 	attribute map[string]string
 }
 
+type CommentNode struct{
+	value string
+	/* children []*Node */
+}
+
 type Parser struct {
 	parentNodeStack []*Node
 }
@@ -201,6 +206,7 @@ func (p *Parser) tokenize(bytes []byte) []*Token {
 			outIfBufExist(&tokens, &buf)
 			tokens = append(tokens, newToken(RightBracket, ""))
 		case (b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z'):
+			// TODO : how to handle the symbol of number in string?
 			buf = append(buf, b)
 		default:
 			// do nothing
