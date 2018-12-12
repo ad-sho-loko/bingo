@@ -38,8 +38,11 @@ func main() {
 	// Tokenize
 	// Make AST
 	// Generate VM Code
-	// Execute in
+	// Execute?
+
+	// Make Rendering tree by using dom tree.
+
 
 	// [Rendering]
-	// Finally, Rendering.
+	// Finally, Rendering by walking rendering tree.
 }
