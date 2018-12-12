@@ -3,6 +3,6 @@ jobs:
   build:
     docker:
       - image: circleci/golang:1.11
-    working_directory: /my-app
+    working_directory: /bingo
     steps:
       - checkout
