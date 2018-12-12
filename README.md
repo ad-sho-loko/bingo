@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/ad-sho-loko/bingo.svg?style=svg)](https://circleci.com/gh/ad-sho-loko/bingo)
+
 # bingo
 bingo is toy web browser written in Go.
 
