@@ -14,7 +14,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Tokeninze html
+	// Tokenize html
 	p := NewParser()
 	tokens := p.tokenize(f)
 	/*
@@ -23,10 +23,15 @@ func main() {
 	}*/
 
 	// Parse Tokens
-	nodes := p.parse(tokens)
-	for _, n := range nodes {
-		fmt.Print(n)
+	nodeTree := p.parse(tokens)
+	/*
+	for _, n := range nodes {fmt.Print(n)
 	}
+	*/
+
+	nodeTree.Walk(func(n Node){
+		fmt.Println(n)
+	})
 
 	// [CSS]
 	// Read css file

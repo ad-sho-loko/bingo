@@ -91,7 +91,7 @@ func (p *Parser) popNode() Node {
 	return n
 }
 
-func (p *Parser) parse(tokens []*Token) []Node {
+func (p *Parser) parse(tokens []*Token) *NodeTree {
 	var nodes []Node
 	for ; p.pos < len(tokens); p.pos++{
 	switch tokens[p.pos].kind {
@@ -118,7 +118,7 @@ func (p *Parser) parse(tokens []*Token) []Node {
 			// FIXME: Skip tab, LF, CR...(if you need to parse, add case of Text, Space....
 		}
 	}
-	return nodes
+	return &NodeTree{nodeList:nodes}
 }
 
 func (p *Parser) parseTag(tokens []*Token) Node {
@@ -227,4 +227,27 @@ func outIfBufExist(tokens *[]*Token, buf *[]byte) bool {
 	}
 	return false
 }
+
+type NodeTree struct {
+	nodeList []Node
+}
+
+func (t *NodeTree) Walk(f func(me Node)){
+	t.walkMap(t.nodeList[0], f)
+}
+
+func (t *NodeTree) walkRecursive(node Node) {
+	for _, n := range node.Children(){
+		t.walkRecursive(n)
+	}
+}
+
+func (t *NodeTree) walkMap(node Node, f func(me Node)){
+	f(node)
+	for _, child := range node.Children(){
+		t.walkMap(child, f)
+	}
+}
+
+
 
