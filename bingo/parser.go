@@ -209,8 +209,7 @@ func (p *Parser) tokenize(bytes []byte) []*Token {
 		case b == '>':
 			outIfBufExist(&tokens, &buf)
 			tokens = append(tokens, newToken(RightBracket, ""))
-		case (b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z'):
-			// TODO : how to handle the symbol of number in string?
+		case (b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z') || (b >= '0' && b <= '9'):
 			buf = append(buf, b)
 		default:
 			// do nothing
