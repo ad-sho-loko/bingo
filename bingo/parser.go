@@ -1,6 +1,6 @@
 // Copyright 2018 Shogo Arakawa. Released under the MIT license.
 
-// Implements the html parser(tokenizer) that creates NodeTree for rendering in the bingo browser.
+// Implements the html tokenizer/parser that creates NodeTree for rendering in the bingo browser.
 
 package main
 

@@ -49,5 +49,5 @@ func main() {
 	// Bridge of GUI and RenderTree
 	// need to implement running render engine async.
 	re := RenderEngine{}
-	go re.run()
+	re.run()
 }

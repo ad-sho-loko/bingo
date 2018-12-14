@@ -2,6 +2,10 @@
 
 package main
 
+import (
+	. "github.com/lxn/walk/declarative"
+)
+
 type RenderTree struct{
 	RenderObjects []RenderObject
 }
@@ -20,10 +24,11 @@ func (r *RenderTree) walk(){
 type RenderObject interface {
 	Node() Node
 	Children() []RenderObject
+	Paint(info PaintInfo)
 
 	// paintInfoにはタグの属性(h1,pとか)、中身（helloとか）、cssスタイル(displayとか）が詰められている.
 	// それを参考にGUIライブラリ側にマッピングをしていく作業が必要になる.
-	Render(paintInfo PaintInfo)
+	// Render(paintInfo PaintInfo)
 }
 
 // Style of RenderObject Collection.
@@ -36,14 +41,11 @@ func (b *InlineBlock) Node() Node{
 	return b.node
 }
 
-func (b *InlineBlock) Render(paintInfo PaintInfo){
-}
-
 func (b *InlineBlock) Children() []RenderObject{
 	return nil
 }
 
-func NewInlineBlock(node Node) RenderObject{
+func NewInlineBlock(node Node) *InlineBlock{
 	return &InlineBlock{
 		node:node,
 	}
@@ -52,15 +54,21 @@ func NewInlineBlock(node Node) RenderObject{
 type Block struct{
 }
 
+
 // Element Tag Collections.
 
 type H1 struct{
+	*InlineBlock
 }
 
-func (h *H1) paint(){
+func (h *H1) Paint(info PaintInfo) Widget{
+	return &TextEdit{
+		Text:"Hello",
+	}
 }
 
 type Paragraph struct{
+	*InlineBlock
 }
 
 type PaintInfo struct{

@@ -1,20 +1,22 @@
+// Copyright 2018 Shogo Arakawa. Released under the MIT license.
+
 package main
 
 import (
-	"fmt"
 	"github.com/lxn/walk"
 	. "github.com/lxn/walk/declarative"
-	"io/ioutil"
 	"log"
 )
 
 type RenderEngine struct{
+	window *walk.MainWindow
 	renderTree *RenderTree
 }
 
-func (e *RenderEngine) paintAll() CustomWidget{
-	// e.renderTree.PaintAll()
-	return CustomWidget{}
+func (e *RenderEngine) paintAll(){
+	// h := H1{}.Paint(PaintInfo{})
+	// e.window.Children().Add()
+	// fmt.Println(e.window.Children)
 }
 
 func (e *RenderEngine) run(){
@@ -24,7 +26,8 @@ func (e *RenderEngine) run(){
 		maxWidth  = 600
 	)
 
-	if _, err := (MainWindow{
+	_, err := (MainWindow{
+		AssignTo:&e.window,
 		Title:   "bingo",
 		MinSize: Size{Height: maxHeight, Width: maxWidth},
 		Layout:  VBox{},
@@ -40,10 +43,15 @@ func (e *RenderEngine) run(){
 					PushButton{
 						Text: "Go",
 						OnClicked: func() {
+							/*
 							var _, err = ioutil.ReadFile(inTE.Text())
 							if err != nil {
 								fmt.Printf("Cannot find %s", inTE.Text())
-							}
+							}*/
+
+							// mock
+							e.paintAll()
+
 							// Parse 3 files
 							// go html parser
 							// go css parser
@@ -63,13 +71,10 @@ func (e *RenderEngine) run(){
 					},
 				},
 			},
-
-			// Rendering Area of node tree. better Canvas??
-			CustomWidget{
-
-			},
 		},
-	}.Run()); err != nil{
+	}).Run()
+
+	if err != nil{
 		log.Fatal(err)
 	}
 }
