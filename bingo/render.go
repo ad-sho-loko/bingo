@@ -1,3 +1,5 @@
+// Copyright 2018 Shogo Arakawa. Released under the MIT license.
+
 package main
 
 type displayProp int
@@ -13,5 +15,21 @@ var displayKind = map[string]displayProp{
 	"p":block,
 }
 
+type RenderTree struct{
+}
 
+type RenderObect interface {
+	Node() Node
+	Render(paintInfo PaintInfo)
+}
+
+type h1 struct{
+}
+
+type p struct{
+}
+
+type PaintInfo struct{
+
+}
 

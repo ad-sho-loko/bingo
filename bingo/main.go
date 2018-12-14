@@ -1,3 +1,5 @@
+// Copyright 2018 Shogo Arakawa. Released under the MIT license.
+
 package main
 
 import (

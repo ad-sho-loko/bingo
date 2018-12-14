@@ -1,12 +1,25 @@
+// Copyright 2018 Shogo Arakawa. Released under the MIT license.
+
+// Implements the html parser(tokenizer) that creates NodeTree for rendering in the bingo browser.
+
 package main
 
 import (
 	"fmt"
 )
 
+type NodeKind int
+
+const(
+	Document NodeKind = iota
+	Element
+	Text
+)
+
 type Node interface {
 	Children() []Node
 	AddChild(child Node)
+	Kind() NodeKind
 }
 
 // Root node in dom tree.
@@ -22,14 +35,14 @@ func (n *DocumentNode) AddChild(child Node) {
 	n.children = append(n.children, child)
 }
 
+func (n *DocumentNode) Kind() NodeKind{
+	return Document
+}
+
 type ElementNode struct {
 	name     string
 	attribute map[string]string
 	children []Node
-}
-
-func (n *ElementNode) String() string{
-	return fmt.Sprintf("ElementNode[%p]%+v\n", n, *n)
 }
 
 func (n *ElementNode) Children() []Node {
@@ -40,13 +53,17 @@ func (n *ElementNode) AddChild(child Node) {
 	n.children = append(n.children, child)
 }
 
+func (n *ElementNode) Kind() NodeKind{
+	return Element
+}
+
+func (n *ElementNode) String() string{
+	return fmt.Sprintf("ElementNode[%p]%+v\n", n, *n)
+}
+
 type TextNode struct {
 	value    string
 	children []Node
-}
-
-func (n *TextNode) String() string{
-	return fmt.Sprintf("TextNode[%p]%+v\n", n, *n)
 }
 
 func (n *TextNode) Children() []Node {
@@ -57,10 +74,19 @@ func (n *TextNode) AddChild(child Node) {
 	n.children = append(n.children, child)
 }
 
+func (n *TextNode) Kind() NodeKind{
+	return Text
+}
+
+func (n *TextNode) String() string{
+	return fmt.Sprintf("TextNode[%p]%+v\n", n, *n)
+}
+
+/*
 type CommentNode struct{
 	value string
-	/* children []*Node */
 }
+*/
 
 type Parser struct {
 	pos int
@@ -105,7 +131,7 @@ func (p *Parser) parse(tokens []*Token) *NodeTree {
 			p.parseTag(tokens)
 			p.popNode()
 
-		case Text, Space:
+		case TextString, Space:
 			node := &TextNode{value: "", children: []Node{}}
 			for ; !(tokens[p.pos].kind == LeftBracket || tokens[p.pos].kind == LeftBracketWithSlash); p.pos++ {
 				node.value += tokens[p.pos].value
@@ -115,7 +141,7 @@ func (p *Parser) parse(tokens []*Token) *NodeTree {
 			nodes = append(nodes, node)
 
 		default:
-			// FIXME: Skip tab, LF, CR...(if you need to parse, add case of Text, Space....
+			// FIXME: Skip tab, LF, CR...(if you need to parse, add case of TextString, Space....
 		}
 	}
 	return &NodeTree{nodeList:nodes}
@@ -125,7 +151,7 @@ func (p *Parser) parseTag(tokens []*Token) Node {
 	p.pos++
 	p.skipSpace(tokens)
 
-	if tokens[p.pos].kind != Text {
+	if tokens[p.pos].kind != TextString {
 		panic("The next token of Left bracket should be string.")
 	}
 
@@ -160,7 +186,7 @@ const (
 	LeftBracket
 	RightBracket
 	LeftBracketWithSlash
-	Text
+	TextString
 )
 
 func (t tokenType) String() string {
@@ -173,8 +199,8 @@ func (t tokenType) String() string {
 		return "RightBracket"
 	case LeftBracketWithSlash:
 		return "LeftBracketWithSlash"
-	case Text:
-		return "Text"
+	case TextString:
+		return "TextString"
 	default:
 		return "Others"
 	}
@@ -220,7 +246,7 @@ func (p *Parser) tokenize(bytes []byte) []*Token {
 
 func outIfBufExist(tokens *[]*Token, buf *[]byte) bool {
 	if len(*buf) != 0 {
-		*tokens = append(*tokens, newToken(Text, string(*buf)))
+		*tokens = append(*tokens, newToken(TextString, string(*buf)))
 		*buf = nil
 		return true
 	}
@@ -229,6 +255,17 @@ func outIfBufExist(tokens *[]*Token, buf *[]byte) bool {
 
 type NodeTree struct {
 	nodeList []Node
+}
+
+func (t *NodeTree) bodyNodeList() []Node{
+	// find body element.
+	for i, n := range t.nodeList{
+		if n.Kind() == Element{
+			return t.nodeList[i:]
+		}
+	}
+	// error
+	return nil
 }
 
 func (t *NodeTree) Walk(f func(me Node)){
@@ -247,6 +284,3 @@ func (t *NodeTree) walkMap(node Node, f func(me Node)){
 		t.walkMap(child, f)
 	}
 }
-
-
-
