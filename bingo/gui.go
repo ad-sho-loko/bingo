@@ -14,9 +14,11 @@ type RenderEngine struct{
 }
 
 func (e *RenderEngine) paintAll(){
-	// h := H1{}.Paint(PaintInfo{})
-	// e.window.Children().Add()
-	// fmt.Println(e.window.Children)
+	// item := H1{}.Paint(PaintInfo{})
+}
+
+func NewRenderEngine() *RenderEngine{
+	return nil // todo
 }
 
 func (e *RenderEngine) run(){

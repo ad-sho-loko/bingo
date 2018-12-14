@@ -8,6 +8,15 @@ import (
 )
 
 func main() {
+
+	// GUI RUN
+
+	// if clicked..
+	// [HTTP]
+	// send request
+	// receive response
+	// extract HTML, CSS, JavaScript
+
 	// [HTML]
 	// Read html file.
 	f, err := ioutil.ReadFile("./test/test1.html")

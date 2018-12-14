@@ -19,16 +19,12 @@ func (r *RenderTree) walk(){
 }
 
 // RenderObject.
-// eg) h1 tag implements 2 interfaces which are RenderObject and Block.
+// eg) h1 element implements 2 interfaces which are RenderObject and Block.
 // RenderObject <-- Block <-- h1
 type RenderObject interface {
 	Node() Node
 	Children() []RenderObject
 	Paint(info PaintInfo)
-
-	// paintInfoにはタグの属性(h1,pとか)、中身（helloとか）、cssスタイル(displayとか）が詰められている.
-	// それを参考にGUIライブラリ側にマッピングをしていく作業が必要になる.
-	// Render(paintInfo PaintInfo)
 }
 
 // Style of RenderObject Collection.
@@ -43,6 +39,10 @@ func (b *InlineBlock) Node() Node{
 
 func (b *InlineBlock) Children() []RenderObject{
 	return nil
+}
+
+func (b *InlineBlock) Splitter() *HSplitter{
+	return &HSplitter{}
 }
 
 func NewInlineBlock(node Node) *InlineBlock{
@@ -62,9 +62,11 @@ type H1 struct{
 }
 
 func (h *H1) Paint(info PaintInfo) Widget{
+	return h.Splitter().Children
+	/*
 	return &TextEdit{
 		Text:"Hello",
-	}
+	}*/
 }
 
 type Paragraph struct{
