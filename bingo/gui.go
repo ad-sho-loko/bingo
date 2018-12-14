@@ -12,6 +12,11 @@ type RenderEngine struct{
 	renderTree *RenderTree
 }
 
+func (e *RenderEngine) paintAll() CustomWidget{
+	// e.renderTree.PaintAll()
+	return CustomWidget{}
+}
+
 func (e *RenderEngine) run(){
 	var inTE *walk.TextEdit
 	const (
@@ -59,8 +64,10 @@ func (e *RenderEngine) run(){
 				},
 			},
 
-			// Rendering Area of node tree.
-			CustomWidget{},
+			// Rendering Area of node tree. better Canvas??
+			CustomWidget{
+
+			},
 		},
 	}.Run()); err != nil{
 		log.Fatal(err)

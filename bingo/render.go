@@ -11,7 +11,7 @@ func NewRenderTree(nodeTree *NodeTree) *RenderTree{
 	}
 }
 
-func (t *RenderTree) PaintAll(){
+func (r *RenderTree) walk(){
 }
 
 // RenderObject.
@@ -19,6 +19,7 @@ func (t *RenderTree) PaintAll(){
 // RenderObject <-- Block <-- h1
 type RenderObject interface {
 	Node() Node
+	Children() []RenderObject
 
 	// paintInfoにはタグの属性(h1,pとか)、中身（helloとか）、cssスタイル(displayとか）が詰められている.
 	// それを参考にGUIライブラリ側にマッピングをしていく作業が必要になる.
@@ -38,6 +39,10 @@ func (b *InlineBlock) Node() Node{
 func (b *InlineBlock) Render(paintInfo PaintInfo){
 }
 
+func (b *InlineBlock) Children() []RenderObject{
+	return nil
+}
+
 func NewInlineBlock(node Node) RenderObject{
 	return &InlineBlock{
 		node:node,
@@ -50,6 +55,9 @@ type Block struct{
 // Element Tag Collections.
 
 type H1 struct{
+}
+
+func (h *H1) paint(){
 }
 
 type Paragraph struct{

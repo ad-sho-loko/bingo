@@ -43,11 +43,11 @@ func main() {
 
 	// [Rendering]
 	// Finally, Rendering by walking rendering tree.
-	r := NewRenderTree(nodeTree)
-	r.PaintAll()
+	// r := NewRenderTree(nodeTree)
+	// r.PaintAll()
 
-	// Connection of GUI and RenderTree
+	// Bridge of GUI and RenderTree
+	// need to implement running render engine async.
 	re := RenderEngine{}
-	re.run()
-
+	go re.run()
 }
