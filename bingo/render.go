@@ -62,7 +62,8 @@ type H1 struct{
 }
 
 func (h *H1) Paint(info PaintInfo) Widget{
-	return h.Splitter().Children
+	return nil
+	// return h.Splitter().Children
 	/*
 	return &TextEdit{
 		Text:"Hello",
