@@ -4,9 +4,7 @@
 
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
 
 type NodeKind int
 
@@ -174,6 +172,13 @@ func (p *Parser) skipSpace(tokens []*Token) {
 	}
 }
 
+type Lexer struct{
+}
+
+func NewLexer() *Lexer{
+	return &Lexer{}
+}
+
 type Token struct {
 	kind  tokenType
 	value string
@@ -214,7 +219,7 @@ func newToken(k tokenType, v string) *Token {
 }
 
 // Impl to tokenize just ASCII code. not able to read 日本語(Unicode).
-func (p *Parser) tokenize(bytes []byte) []*Token {
+func (t *Lexer) tokenize(bytes []byte) []*Token {
 	var tokens []*Token
 	var buf []byte
 	for i, b := range bytes {
@@ -223,17 +228,17 @@ func (p *Parser) tokenize(bytes []byte) []*Token {
 		//	outIfBufExist()
 		//  tokens = Comment!
 		case b == ' ':
-			outIfBufExist(&tokens, &buf)
+			t.outIfBufExist(&tokens, &buf)
 			tokens = append(tokens, newToken(Space, " "))
 		case b == '<':
-			outIfBufExist(&tokens, &buf)
+			t.outIfBufExist(&tokens, &buf)
 			if bytes[i+1] == '/' {
 				tokens = append(tokens, newToken(LeftBracketWithSlash, ""))
 			} else {
 				tokens = append(tokens, newToken(LeftBracket, ""))
 			}
 		case b == '>':
-			outIfBufExist(&tokens, &buf)
+			t.outIfBufExist(&tokens, &buf)
 			tokens = append(tokens, newToken(RightBracket, ""))
 		case (b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z') || (b >= '0' && b <= '9'):
 			buf = append(buf, b)
@@ -244,7 +249,7 @@ func (p *Parser) tokenize(bytes []byte) []*Token {
 	return tokens
 }
 
-func outIfBufExist(tokens *[]*Token, buf *[]byte) bool {
+func (t *Lexer) outIfBufExist(tokens *[]*Token, buf *[]byte) bool {
 	if len(*buf) != 0 {
 		*tokens = append(*tokens, newToken(TextString, string(*buf)))
 		*buf = nil
@@ -283,4 +288,10 @@ func (t *NodeTree) walkMap(node Node, f func(me Node)){
 	for _, child := range node.Children(){
 		t.walkMap(child, f)
 	}
+}
+
+func (t *NodeTree) Print(){
+	t.Walk(func(child Node){
+		fmt.Print(child)
+	})
 }

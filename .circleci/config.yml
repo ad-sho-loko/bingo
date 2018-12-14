@@ -5,3 +5,4 @@ jobs:
       - image: circleci/golang:1.11
     steps:
       - checkout
+      - go get github.com/lxn/walk

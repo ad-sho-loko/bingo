@@ -3,7 +3,6 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 )
@@ -17,28 +16,21 @@ func main() {
 	}
 
 	// Tokenize html
-	p := NewParser()
-	tokens := p.tokenize(f)
-	/*
-	for _, t := range tokens {
-		fmt.Print(*t)
-	}*/
+	l := NewLexer()
+	tokens := l.tokenize(f)
 
 	// Parse Tokens
+	p := NewParser()
 	nodeTree := p.parse(tokens)
-	/*
-	for _, n := range nodes {fmt.Print(n)
-	}
-	*/
-
-	nodeTree.Walk(func(n Node){
-		fmt.Println(n)
-	})
+	nodeTree.Print()
 
 	// [CSS]
 	// Read css file
 	// Tokenize css
 	// Parse Tokens
+
+	// [Attach html, css for node]
+	// attach html & css
 
 	// [JavaScript]
 	// Read JavaScript
@@ -49,7 +41,13 @@ func main() {
 
 	// Make Rendering tree by using dom tree.
 
-
 	// [Rendering]
 	// Finally, Rendering by walking rendering tree.
+	r := NewRenderTree(nodeTree)
+	r.PaintAll()
+
+	// Connection of GUI and RenderTree
+	re := RenderEngine{}
+	re.run()
+
 }
