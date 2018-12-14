@@ -5,7 +5,23 @@ bingo is toy web browser written in Go.
 
 ## Demo
 
-## How to build
+## How to build(and run)
+
+## Implement
+
+### html
+- p
+- h1
+- img
+
+### css 
+
+nothing
+
+### JavaScript
+
+- assignment variables 
+- operator(+, -, *, /)
 
 ## LICENCE
 MIT

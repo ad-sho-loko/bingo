@@ -40,7 +40,7 @@ func (e *RenderEngine) run(){
 				Children: []Widget{
 					TextEdit{
 						StretchFactor: 100,
-						Text:          "test/index.html", AssignTo: &inTE,
+						Text:          "example/index.html", AssignTo: &inTE,
 					},
 					PushButton{
 						Text: "Go",

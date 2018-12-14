@@ -19,7 +19,7 @@ func main() {
 
 	// [HTML]
 	// Read html file.
-	f, err := ioutil.ReadFile("./test/test1.html")
+	f, err := ioutil.ReadFile("./example/test1.html")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -32,6 +32,7 @@ func main() {
 	p := NewParser()
 	nodeTree := p.parse(tokens)
 	nodeTree.Print()
+
 
 	// [CSS]
 	// Read css file
