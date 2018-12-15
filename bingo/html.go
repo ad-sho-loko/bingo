@@ -176,10 +176,15 @@ func (p *Parser) skipSpace(tokens []*Token) {
 }
 
 type Lexer struct{
+	pos int
+	bytes []byte
 }
 
-func NewLexer() *Lexer{
-	return &Lexer{}
+func NewLexer(bytes []byte) *Lexer{
+	return &Lexer{
+		pos:0,
+		bytes:bytes,
+	}
 }
 
 type Token struct {
@@ -226,37 +231,66 @@ func newToken(k tokenType, v string) *Token {
 }
 
 // Impl to tokenize just ASCII code. not able to read 日本語(Unicode).
-func (t *Lexer) tokenize(bytes []byte) []*Token {
+func (l *Lexer) tokenize() []*Token {
 	var tokens []*Token
 	var buf []byte
-	for i, b := range bytes {
-		switch {
-		// case b == '/' && bytes[i+1] == '*':
-		//	outIfBufExist()
-		//  tokens = Comment!
-		case b == ' ':
-			t.outIfBufExist(&tokens, &buf)
+	for l.hasToken(){
+		ch := l.peek(); switch {
+		case ' ' == ch:
+			l.outIfBufExist(&tokens, &buf)
 			tokens = append(tokens, newToken(Space, " "))
-		case b == '<':
-			t.outIfBufExist(&tokens, &buf)
-			if bytes[i+1] == '/' {
+		case '<' == ch:
+			l.outIfBufExist(&tokens, &buf)
+			if l.hasNext() && l.peekNext() == '/' {
 				tokens = append(tokens, newToken(LeftBracketWithSlash, ""))
+				l.next()
 			} else {
 				tokens = append(tokens, newToken(LeftBracket, ""))
 			}
-		case b == '>':
-			t.outIfBufExist(&tokens, &buf)
+		case '>' == ch:
+			l.outIfBufExist(&tokens, &buf)
 			tokens = append(tokens, newToken(RightBracket, ""))
-		case (b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z') || (b >= '0' && b <= '9'):
-			buf = append(buf, b)
+		case l.isAlpha(ch) || l.isDigit(ch):
+			buf = append(buf, ch)
 		default:
 			// do nothing
 		}
+		l.next()
 	}
 	return tokens
 }
 
-func (t *Lexer) outIfBufExist(tokens *[]*Token, buf *[]byte) bool {
+func (l *Lexer) peek() byte{
+	return l.bytes[l.pos]
+}
+
+func (l *Lexer) next(){
+	// assert that hasNext is true
+	l.pos++
+}
+
+func (l *Lexer) hasToken() bool{
+	return l.pos < len(l.bytes)
+}
+
+func (l *Lexer) hasNext() bool{
+	return l.pos + 1 < len(l.bytes)
+}
+
+func (l *Lexer) peekNext() byte{
+	// assert that hasNext is true
+	return l.bytes[l.pos+1]
+}
+
+func (l *Lexer) isDigit(b byte) bool{
+	return b >= '0' && b <= '9'
+}
+
+func (l *Lexer) isAlpha(b byte) bool{
+	return (b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z')
+}
+
+func (l *Lexer) outIfBufExist(tokens *[]*Token, buf *[]byte) bool {
 	if len(*buf) != 0 {
 		*tokens = append(*tokens, newToken(TextString, string(*buf)))
 		*buf = nil

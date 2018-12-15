@@ -25,8 +25,8 @@ func main() {
 	}
 
 	// Tokenize html
-	l := NewLexer()
-	tokens := l.tokenize(f)
+	l := NewLexer(f)
+	tokens := l.tokenize()
 
 	// Parse Tokens
 	p := NewParser()

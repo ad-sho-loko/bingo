@@ -24,7 +24,7 @@ func TestBracketToken(t *testing.T) {
 		{kind: LeftBracket, value: ""},
 		{kind: RightBracket, value: ""},
 	}
-	actual := NewLexer().tokenize([]byte{'<', '>'})
+	actual := NewLexer([]byte{'<', '>'}).tokenize()
 	assertTokenSlice(expected, actual, t)
 }
 
@@ -33,7 +33,7 @@ func TestLeftBracketToken(t *testing.T){
 		{kind: LeftBracketWithSlash, value: ""},
 		{kind: RightBracket, value: ""},
 	}
-	actual := NewLexer().tokenize([]byte{'<', '/', '>'})
+	actual := NewLexer([]byte{'<', '/', '>'}).tokenize()
 	assertTokenSlice(expected, actual, t)
 }
 
@@ -43,7 +43,7 @@ func TestBracketWithSpaceToken(t *testing.T){
 		{kind: Space, value: " "},
 		{kind: RightBracket, value: ""},
 	}
-	actual := NewLexer().tokenize([]byte{'<', ' ', '>'})
+	actual := NewLexer([]byte{'<', ' ', '>'}).tokenize()
 	assertTokenSlice(expected, actual, t)
 }
 
@@ -53,7 +53,7 @@ func TestTextStringToken(t *testing.T){
 		{kind: TextString, value: "h1"},
 		{kind: RightBracket, value: ""},
 	}
-	actual := NewLexer().tokenize([]byte{'<', 'h', '1', '>'})
+	actual := NewLexer([]byte{'<', 'h', '1', '>'}).tokenize()
 	assertTokenSlice(expected, actual, t)
 }
 
@@ -66,6 +66,6 @@ func TestStartEndToken(t *testing.T){
 		{kind: TextString, value: "h1"},
 		{kind: RightBracket, value: ""},
 	}
-	actual := NewLexer().tokenize([]byte{'<', 'h', '1', '>', '<', '/', 'h', '1', '>'})
+	actual := NewLexer([]byte{'<', 'h', '1', '>', '<', '/', 'h', '1', '>'}).tokenize()
 	assertTokenSlice(expected, actual, t)
 }
