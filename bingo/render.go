@@ -10,7 +10,7 @@ type RenderTree struct{
 	RenderObjects []RenderObject
 }
 
-func NewRenderTree(nodeTree *NodeTree) *RenderTree{
+func MakeRenderTree(nodeTree *NodeTree) *RenderTree{
 	return &RenderTree{
 	}
 }
@@ -54,7 +54,6 @@ func NewInlineBlock(node Node) *InlineBlock{
 type Block struct{
 }
 
-
 // Element Tag Collections.
 
 type H1 struct{
@@ -72,6 +71,10 @@ func (h *H1) Paint(info PaintInfo) Widget{
 
 type Paragraph struct{
 	*InlineBlock
+}
+
+func (p *Paragraph) Paint(info PaintInfo) Widget{
+	return nil
 }
 
 type PaintInfo struct{

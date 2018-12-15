@@ -4,7 +4,10 @@
 
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/k0kubun/pp"
+	)
 
 type NodeKind int
 
@@ -56,7 +59,7 @@ func (n *ElementNode) Kind() NodeKind{
 }
 
 func (n *ElementNode) String() string{
-	return fmt.Sprintf("ElementNode[%p]%+v\n", n, *n)
+	return pp.Sprintf("ElementNode[%p]%+v\n", n, *n)
 }
 
 type TextNode struct {
@@ -77,7 +80,7 @@ func (n *TextNode) Kind() NodeKind{
 }
 
 func (n *TextNode) String() string{
-	return fmt.Sprintf("TextNode[%p]%+v\n", n, *n)
+	return pp.Sprintf("TextNode[%p]%+v\n", n, *n)
 }
 
 /*
@@ -182,6 +185,10 @@ func NewLexer() *Lexer{
 type Token struct {
 	kind  tokenType
 	value string
+}
+
+func (t Token) String() string{
+	return fmt.Sprintf("[%p] ", &t) + pp.Sprint(t)
 }
 
 type tokenType int
