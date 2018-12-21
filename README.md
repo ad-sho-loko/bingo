@@ -5,14 +5,16 @@ bingo is toy web browser written in Go.
 
 ## Demo
 
+
+## Requirements
+- Windows10 (because of dependency with `walk`)
+
 ## How to build(and run)
 
 ## Implement
 
 ### html
-- p
 - h1
-- img
 
 ### css 
 
