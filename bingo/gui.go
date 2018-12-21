@@ -10,15 +10,18 @@ import (
 
 type RenderEngine struct{
 	window *walk.MainWindow
+	widgets *walk.CustomWidget
 	renderTree *RenderTree
 }
 
-func (e *RenderEngine) paintAll(){
-	// item := H1{}.Paint(PaintInfo{})
+func NewRenderEngine(tree *RenderTree) *RenderEngine{
+	return &RenderEngine{
+		renderTree:tree,
+	}
 }
 
-func NewRenderEngine() *RenderEngine{
-	return nil // todo
+func (e *RenderEngine) paintAll(){
+	e.renderTree.walk(e.widgets.Parent())
 }
 
 func (e *RenderEngine) run(){
@@ -45,6 +48,8 @@ func (e *RenderEngine) run(){
 					PushButton{
 						Text: "Go",
 						OnClicked: func() {
+
+							clicked()
 							/*
 							var _, err = ioutil.ReadFile(inTE.Text())
 							if err != nil {
@@ -60,18 +65,17 @@ func (e *RenderEngine) run(){
 							// go js parser(lexer)
 
 							// construct rendering tree
-
 							// eg1. h1 tag, content = hello
-
-							// TODO
-							// h1 tag -> TextWidget(h1用のTextWidgetが必要か)にマッピング
-							// TextWidgetのTextに`Hello`を挿入
 
 							// Render by walking rendering tree
 
 						},
 					},
 				},
+			},
+			// Custom Widget
+			CustomWidget{
+				AssignTo:&e.widgets,
 			},
 		},
 	}).Run()

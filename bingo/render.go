@@ -3,6 +3,7 @@
 package main
 
 import (
+	"github.com/lxn/walk"
 	. "github.com/lxn/walk/declarative"
 )
 
@@ -11,11 +12,18 @@ type RenderTree struct{
 }
 
 func MakeRenderTree(nodeTree *NodeTree) *RenderTree{
+	// skipByBody
+	objs := []RenderObject{
+			&H1{},
+	}
 	return &RenderTree{
+		RenderObjects:objs,
 	}
 }
 
-func (r *RenderTree) walk(){
+func (r *RenderTree) walk(c walk.Container){
+	// FIXME
+	r.RenderObjects[0].Paint(c, PaintInfo{})
 }
 
 // RenderObject.
@@ -24,7 +32,7 @@ func (r *RenderTree) walk(){
 type RenderObject interface {
 	Node() Node
 	Children() []RenderObject
-	Paint(info PaintInfo)
+	Paint(c walk.Container, info PaintInfo)
 }
 
 // Style of RenderObject Collection.
@@ -60,21 +68,15 @@ type H1 struct{
 	*InlineBlock
 }
 
-func (h *H1) Paint(info PaintInfo) Widget{
-	return nil
-	// return h.Splitter().Children
-	/*
-	return &TextEdit{
-		Text:"Hello",
-	}*/
+func (h *H1) Paint(c walk.Container, info PaintInfo) {
+	walk.NewTextEdit(c)
 }
 
 type Paragraph struct{
 	*InlineBlock
 }
 
-func (p *Paragraph) Paint(info PaintInfo) Widget{
-	return nil
+func (p *Paragraph) Paint(c walk.Container, info PaintInfo){
 }
 
 type PaintInfo struct{

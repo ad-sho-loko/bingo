@@ -230,7 +230,7 @@ func newToken(k tokenType, v string) *Token {
 	}
 }
 
-// Impl to tokenize just ASCII code. not able to read 日本語(Unicode).
+// Impl to tokenize just ASCII code, doesn't support for Unicode.
 func (l *Lexer) tokenize() []*Token {
 	var tokens []*Token
 	var buf []byte

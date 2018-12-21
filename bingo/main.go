@@ -7,8 +7,11 @@ import (
 	"log"
 )
 
-func main() {
+func clicked(){
+	// request("")
+}
 
+func main() {
 	// GUI RUN
 
 	// if clicked..
@@ -32,7 +35,6 @@ func main() {
 	p := NewParser()
 	nodeTree := p.parse(tokens)
 	nodeTree.Print()
-
 
 	// [CSS]
 	// Read css file
@@ -58,6 +60,7 @@ func main() {
 
 	// Bridge of GUI and RenderTree
 	// need to implement running render engine async.
-	re := RenderEngine{}
-	re.run()
+	renderTree := MakeRenderTree(nodeTree)
+	engine := NewRenderEngine(renderTree)
+	engine.run()
 }
