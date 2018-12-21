@@ -56,9 +56,6 @@ func (e *RenderEngine) run(){
 								fmt.Printf("Cannot find %s", inTE.Text())
 							}*/
 
-							// mock
-							e.paintAll()
-
 							// Parse 3 files
 							// go html parser
 							// go css parser
@@ -68,7 +65,7 @@ func (e *RenderEngine) run(){
 							// eg1. h1 tag, content = hello
 
 							// Render by walking rendering tree
-
+							e.paintAll()
 						},
 					},
 				},

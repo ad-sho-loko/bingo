@@ -7,6 +7,7 @@ import (
 	"log"
 )
 
+// when clicked,
 func clicked(){
 	// request("")
 }

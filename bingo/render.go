@@ -13,17 +13,31 @@ type RenderTree struct{
 
 func MakeRenderTree(nodeTree *NodeTree) *RenderTree{
 	// skipByBody
-	objs := []RenderObject{
-			&H1{},
-	}
+	var objs []RenderObject
+	nodeTree.Walk(func(me Node) {
+		if me.Kind() == Element{
+			e := me.(*ElementNode)
+			switch e.name {
+			case "h1":
+				objs = append(objs, NewH1(*e))
+			}
+		}
+	})
+
 	return &RenderTree{
 		RenderObjects:objs,
 	}
 }
 
 func (r *RenderTree) walk(c walk.Container){
-	// FIXME
-	r.RenderObjects[0].Paint(c, PaintInfo{})
+	r.walkPaint(c, r.RenderObjects[0])
+}
+
+func (r *RenderTree) walkPaint(c walk.Container, obj RenderObject){
+	obj.Paint(c, PaintInfo{})
+	for _, child := range obj.Children(){
+		r.walkPaint(c, child)
+	}
 }
 
 // RenderObject.
@@ -66,10 +80,24 @@ type Block struct{
 
 type H1 struct{
 	*InlineBlock
+	text string
+}
+
+func NewH1(n ElementNode) *H1{
+	text := ""
+	for _, child := range n.Children(){
+		if child.Kind() == Text{
+			text += child.(*TextNode).value
+		}
+	}
+	return &H1{
+		text:text,
+	}
 }
 
 func (h *H1) Paint(c walk.Container, info PaintInfo) {
-	walk.NewTextEdit(c)
+	l, _ := walk.NewLabel(c)
+	l.SetText(h.text)
 }
 
 type Paragraph struct{
